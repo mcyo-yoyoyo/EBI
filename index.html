@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>海外电商数智化驾驶舱 Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Datepicker (Lightweight) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        warning: '#FF9500',
+                        danger: '#FF3B30',
+                        surface: '#F2F2F7',
+                        card: '#FFFFFF',
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    fontSize: {
+                        'xxs': '0.65rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F2F2F7; -webkit-tap-highlight-color: transparent; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .chart-container { position: relative; height: 260px; width: 100%; }
+        .mini-chart { height: 60px; width: 100px; }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+        /* Filter Tabs */
+        .filter-tab.active { border-bottom: 2px solid #007AFF; color: #007AFF; font-weight: 600; }
+        .filter-tab { color: #6B7280; padding-bottom: 8px; font-size: 0.9rem; }
+        
+        /* Custom Checkbox */
+        .chip-check:checked + label { background-color: #EBF5FF; color: #007AFF; border-color: #007AFF; }
+
+        /* AI Agent Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        .ai-agent-btn { animation: float 4s ease-in-out infinite; }
+    </style>
+</head>
+<body class="text-gray-900 pb-24">
+
+    <!-- 1. 顶部导航 -->
+    <nav class="glass-nav fixed top-0 w-full z-40">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold tracking-tight text-gray-900">海外电商数智化驾驶舱 <span class="text-primary text-xs bg-primary/10 px-1.5 py-0.5 rounded ml-1">Pro</span></h1>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-xs text-gray-500 bg-gray-100 px-1.5 rounded" id="current-region">全球</span>
+                    <span class="text-xs text-gray-500 bg-gray-100 px-1.5 rounded" id="current-period">本月累计</span>
+                </div>
+            </div>
+            <button onclick="toggleFilterModal()" class="bg-gray-100 active:bg-gray-200 p-2 rounded-full text-primary transition shadow-sm border border-gray-200">
+                <i class="ph-bold ph-faders text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- 数据状态条 -->
+        <div id="status-bar" class="bg-warning/10 px-4 py-1.5 flex justify-between items-center text-xs text-warning-700 border-b border-warning/20">
+            <span class="flex items-center gap-1">
+                <i class="ph-fill ph-warning-circle"></i>
+                <span>预生产数据 (待确认)</span>
+            </span>
+            <button onclick="verifyData()" class="font-semibold underline">确认发布</button>
+        </div>
+    </nav>
+
+    <div class="h-28"></div>
+
+    <!-- 2. 经营类指标 (Executive Summary) -->
+    <main class="px-4 space-y-5">
+        
+        <!-- 头部大卡片：收入与利润 -->
+        <section class="grid grid-cols-2 gap-3">
+            <!-- 收入 -->
+            <div class="bg-card p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div>
+                    <div class="text-gray-500 text-xs font-medium flex items-center gap-1 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary"></span> GMV 收入
+                    </div>
+                    <div class="text-2xl font-bold tracking-tight text-gray-900">¥42.8<span class="text-sm font-normal text-gray-500">亿</span></div>
+                </div>
+                <div class="mt-3">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-400">目标 ¥46亿</span>
+                        <span class="text-primary font-bold">92%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-primary h-1.5 rounded-full" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 利润 -->
+            <div class="bg-card p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div>
+                    <div class="text-gray-500 text-xs font-medium flex items-center gap-1 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-success"></span> 净利润
+                    </div>
+                    <div class="text-2xl font-bold tracking-tight text-gray-900">¥8.56<span class="text-sm font-normal text-gray-500">亿</span></div>
+                </div>
+                <div class="mt-3 flex items-end justify-between">
+                    <div>
+                        <div class="text-xs text-gray-400">同比去年</div>
+                        <div class="text-success text-sm font-bold flex items-center">
+                            <i class="ph-bold ph-trend-up mr-0.5"></i> 12.4%
+                        </div>
+                    </div>
+                    <div class="h-8 w-12">
+                        <!-- 微型趋势图占位 -->
+                        <canvas id="profitSparkline"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 线上份额 2C 全渠道贡献 (Donut Chart) -->
+        <section class="bg-card p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                    <i class="ph-fill ph-chart-pie-slice text-secondary"></i>
+                    线上份额 2C全渠道贡献
+                </h3>
+                <span class="text-xs text-gray-400">占比分析</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-1/2 h-32 relative">
+                    <canvas id="channelShareChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                        <span class="text-xs text-gray-400">总GMV</span>
+                        <span class="text-sm font-bold text-gray-800">100%</span>
+                    </div>
+                </div>
+                <div class="w-1/2 pl-4 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary"></span>自营 APP</span>
+                        <span class="font-bold">45%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#FF9900]"></span>Amazon</span>
+                        <span class="font-bold">30%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#000000]"></span>TikTok</span>
+                        <span class="font-bold">15%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-300"></span>其他</span>
+                        <span class="font-bold">10%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 销售类指标 (Sales Performance) -->
+        <section class="bg-card p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                    <i class="ph-fill ph-trend-up text-primary"></i>
+                    销售趋势 (量价分析)
+                </h3>
+            </div>
+            <div class="flex gap-4 mb-4 text-xs">
+                 <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 bg-primary rounded-full"></span>
+                    <span class="text-gray-500">销售额(万)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 bg-blue-200 rounded-sm"></span>
+                    <span class="text-gray-500">销售量(千台)</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="salesMixedChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 4. 流量类指标 (Traffic & Funnel) -->
+        <section class="bg-card p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                    <i class="ph-fill ph-funnel text-warning"></i>
+                    流转销趋势 & 转化率
+                </h3>
+                <span class="bg-warning/10 text-warning text-xs px-2 py-0.5 rounded font-medium">总转化 2.8%</span>
+            </div>
+            
+            <!-- 漏斗可视化 -->
+            <div class="space-y-3 relative">
+                <!-- Step 1 -->
+                <div class="relative z-10">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1 px-1">
+                        <span>曝光 (Impression)</span>
+                        <span>5,200k</span>
+                    </div>
+                    <div class="h-8 bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div class="absolute top-0 left-0 h-full bg-blue-100 w-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-800">100%</div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative z-10 px-4">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1 px-1">
+                        <span>点击/访客 (Click)</span>
+                        <span>850k</span>
+                    </div>
+                    <div class="h-8 bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div class="absolute top-0 left-0 h-full bg-blue-200 w-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-800">16.3% CTR</div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative z-10 px-8">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1 px-1">
+                        <span>加购 (Cart)</span>
+                        <span>120k</span>
+                    </div>
+                    <div class="h-8 bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div class="absolute top-0 left-0 h-full bg-blue-300 w-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-900">14.1%</div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative z-10 px-12">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1 px-1">
+                        <span>成交 (Order)</span>
+                        <span>24k</span>
+                    </div>
+                    <div class="h-8 bg-gray-100 rounded-lg overflow-hidden relative">
+                        <div class="absolute top-0 left-0 h-full bg-primary w-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">20% 转化</div>
+                    </div>
+                </div>
+                
+                <!-- 连接线 -->
+                <div class="absolute top-4 bottom-4 left-1/2 w-0.5 bg-gray-200 -z-0"></div>
+            </div>
+        </section>
+
+        <!-- 5. 用户类指标 (User Stats) -->
+        <section class="bg-card p-5 rounded-2xl shadow-sm border border-gray-100 mb-4">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 mb-4">
+                <i class="ph-fill ph-users text-purple-500"></i>
+                用户资产分析
+            </h3>
+            
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <div class="text-center p-2 bg-gray-50 rounded-lg">
+                    <div class="text-gray-400 text-xs mb-1">注册用户</div>
+                    <div class="font-bold text-gray-800">1.2M</div>
+                    <div class="text-xxs text-success flex justify-center items-center"><i class="ph-bold ph-caret-up"></i> 5%</div>
+                </div>
+                <div class="text-center p-2 bg-gray-50 rounded-lg border border-purple-100">
+                    <div class="text-purple-500 text-xs mb-1">活跃用户(DAU)</div>
+                    <div class="font-bold text-purple-700">320k</div>
+                    <div class="text-xxs text-success flex justify-center items-center"><i class="ph-bold ph-caret-up"></i> 12%</div>
+                </div>
+                <div class="text-center p-2 bg-gray-50 rounded-lg">
+                    <div class="text-gray-400 text-xs mb-1">订阅用户</div>
+                    <div class="font-bold text-gray-800">85k</div>
+                    <div class="text-xxs text-gray-400">持平</div>
+                </div>
+            </div>
+
+            <!-- NSS 仪表盘 -->
+            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
+                <div class="relative w-16 h-16 flex-shrink-0">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="32" cy="32" r="28" stroke="#E5E7EB" stroke-width="6" fill="transparent" />
+                        <circle cx="32" cy="32" r="28" stroke="#8B5CF6" stroke-width="6" fill="transparent" stroke-dasharray="175" stroke-dashoffset="35" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-lg font-bold text-gray-800">78</div>
+                </div>
+                <div>
+                    <div class="text-sm font-bold text-gray-800">线上 NSS (净推荐值)</div>
+                    <div class="text-xs text-gray-500 mt-1">行业基线 70，当前表现<span class="text-success font-medium">优秀</span></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 6. 复杂的筛选模态框 (Pro Filter) -->
+    <div id="filterModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="toggleFilterModal()"></div>
+        <div class="absolute bottom-0 w-full bg-white rounded-t-3xl h-[85vh] transform transition-transform duration-300 translate-y-full flex flex-col" id="filterContent">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl">
+                <h3 class="text-lg font-bold text-gray-900">数据筛选配置</h3>
+                <button onclick="toggleFilterModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto px-6 py-4 space-y-8 bg-[#F9FAFB]">
+                
+                <!-- 1. 时间筛选 (Timeline) -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-calendar-blank text-primary"></i> 时间维度
+                    </h4>
+                    <div class="bg-white p-1 rounded-xl shadow-sm border border-gray-200 flex mb-3">
+                        <button class="flex-1 py-2 text-xs font-medium rounded-lg bg-gray-100 text-gray-500">日</button>
+                        <button class="flex-1 py-2 text-xs font-medium rounded-lg text-gray-500 hover:bg-gray-50">周</button>
+                        <button class="flex-1 py-2 text-xs font-medium rounded-lg bg-white shadow text-primary border border-gray-100">月</button>
+                        <button class="flex-1 py-2 text-xs font-medium rounded-lg text-gray-500 hover:bg-gray-50">季</button>
+                        <button class="flex-1 py-2 text-xs font-medium rounded-lg text-gray-500 hover:bg-gray-50">年</button>
+                    </div>
+                    <!-- Date Range Picker -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 flex items-center gap-2">
+                        <i class="ph ph-calendar text-gray-400"></i>
+                        <input type="text" id="dateRange" class="w-full text-sm outline-none bg-transparent" placeholder="自定义起止日期...">
+                    </div>
+                </div>
+
+                <!-- 2. 区域层级 (Region Cascade) -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-globe-hemisphere-west text-primary"></i> 区域范围
+                    </h4>
+                    <div class="space-y-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <!-- L1 -->
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">地区部 (Region)</label>
+                            <select class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-primary">
+                                <option>全球 (Global)</option>
+                                <option>欧洲地区部</option>
+                                <option>亚太地区部</option>
+                                <option>美洲地区部</option>
+                            </select>
+                        </div>
+                        <!-- L2 -->
+                        <div class="flex gap-3">
+                            <div class="w-1/2">
+                                <label class="text-xs text-gray-400 mb-1 block">代表处 (Rep Office)</label>
+                                <select class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-primary">
+                                    <option>全部</option>
+                                    <option>西欧</option>
+                                    <option>东北欧</option>
+                                </select>
+                            </div>
+                            <div class="w-1/2">
+                                <label class="text-xs text-gray-400 mb-1 block">国家 (Country)</label>
+                                <select class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-primary">
+                                    <option>全部</option>
+                                    <option>德国</option>
+                                    <option>法国</option>
+                                    <option>英国</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 产业与产品 (Industry & SKU) -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-device-mobile text-primary"></i> 产业与产品
+                    </h4>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <input type="radio" name="industry" id="ind_all" class="hidden chip-check" checked>
+                        <label for="ind_all" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">全产业</label>
+                        
+                        <input type="radio" name="industry" id="ind_phone" class="hidden chip-check">
+                        <label for="ind_phone" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">手机</label>
+                        
+                        <input type="radio" name="industry" id="ind_pc" class="hidden chip-check">
+                        <label for="ind_pc" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">PC</label>
+
+                        <input type="radio" name="industry" id="ind_pad" class="hidden chip-check">
+                        <label for="ind_pad" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">平板</label>
+
+                        <input type="radio" name="industry" id="ind_wear" class="hidden chip-check">
+                        <label for="ind_wear" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">穿戴</label>
+                        
+                        <input type="radio" name="industry" id="ind_audio" class="hidden chip-check">
+                        <label for="ind_audio" class="text-xs px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors">音频</label>
+                    </div>
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
+                        <input type="text" placeholder="输入 SPU / SKU 编码搜索..." class="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-primary">
+                    </div>
+                </div>
+
+                <!-- 4. 渠道 (Channel) -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <i class="ph-fill ph-shopping-cart text-primary"></i> 渠道选择
+                    </h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="ch_self" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
+                            <label for="ch_self" class="text-sm text-gray-700">自营电商 (APP/Web)</label>
+                        </div>
+                        <div class="h-px bg-gray-200 my-1"></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="ch_amz" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
+                                <label for="ch_amz" class="text-sm text-gray-600">Amazon</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="ch_laz" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
+                                <label for="ch_laz" class="text-sm text-gray-600">Lazada</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="ch_shp" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
+                                <label for="ch_shp" class="text-sm text-gray-600">Shopee</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="ch_tik" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
+                                <label for="ch_tik" class="text-sm text-gray-600">TikTok</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="p-4 border-t border-gray-100 bg-white pb-8">
+                <button onclick="applyFilters()" class="w-full bg-primary text-white font-semibold text-lg py-3 rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-check"></i> 应用筛选配置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Agent Button -->
+    <button onclick="toggleAgent()" class="fixed bottom-6 right-4 w-12 h-12 bg-gray-900 rounded-full shadow-2xl flex items-center justify-center text-white ai-agent-btn z-30 active:scale-90 transition-transform">
+        <i class="ph-fill ph-sparkle text-xl"></i>
+    </button>
+    
+    <!-- AI Modal -->
+    <div id="aiModal" class="fixed inset-0 z-50 hidden flex flex-col justify-end pointer-events-none">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-[2px] transition-opacity opacity-0 pointer-events-auto" id="aiBackdrop" onclick="toggleAgent()"></div>
+        <div class="bg-white w-full h-[60vh] rounded-t-3xl shadow-2xl p-4 transform translate-y-full transition-transform duration-300 pointer-events-auto flex flex-col" id="aiContent">
+            
+            <!-- Handle -->
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            
+            <!-- Header -->
+            <div class="flex items-center gap-3 border-b pb-3 mb-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+                    <i class="ph-fill ph-robot text-indigo-600 text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-800">电商智能助手</h4>
+                    <p class="text-xs text-gray-500">基于 LeanCloud & LLM</p>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="flex-1 overflow-y-auto space-y-4 p-2" id="chatContainer">
+                <!-- Bot Msg -->
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center"><i class="ph-fill ph-robot text-gray-500"></i></div>
+                    <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700 max-w-[85%]">
+                        你好！我是你的电商数据助理。你可以问我：<br>
+                        "上周欧洲区商城国利润下滑的原因是什么？"<br>
+                        "预测下个月R国电商库存周转率。"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="mt-2 border-t pt-3 flex gap-2">
+                <input type="text" placeholder="输入您的问题..." class="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 text-sm focus:outline-none focus:border-indigo-500">
+                <button class="bg-indigo-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md">
+                    <i class="ph-bold ph-paper-plane-right"></i>
+                </button>
+            </div>
+            <div class="safe-area-bottom"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 初始化 DatePicker ---
+        flatpickr("#dateRange", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            locale: {
+                rangeSeparator: " 至 "
+            }
+        });
+
+        // --- 2. Chart.js 初始化 ---
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+        });
+
+        function initCharts() {
+            // Chart 1: 利润微型图 (Sparkline)
+            const ctxProfit = document.getElementById('profitSparkline').getContext('2d');
+            new Chart(ctxProfit, {
+                type: 'line',
+                data: {
+                    labels: [1,2,3,4,5],
+                    datasets: [{
+                        data: [10, 12, 11, 14, 15],
+                        borderColor: '#34C759',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+
+            // Chart 2: 渠道份额 (Doughnut)
+            const ctxShare = document.getElementById('channelShareChart').getContext('2d');
+            new Chart(ctxShare, {
+                type: 'doughnut',
+                data: {
+                    labels: ['自营', 'Amazon', 'TikTok', '其他'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: ['#007AFF', '#FF9900', '#000000', '#D1D5DB'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Chart 3: 销售量价分析 (Dual Axis Mixed Chart)
+            const ctxSales = document.getElementById('salesMixedChart').getContext('2d');
+            let salesMixedChart = new Chart(ctxSales, {
+                type: 'bar',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: '销售额 (万)',
+                            data: [1200, 1350, 1100, 1580],
+                            borderColor: '#007AFF',
+                            backgroundColor: '#007AFF',
+                            borderWidth: 2,
+                            yAxisID: 'y',
+                            tension: 0.4
+                        },
+                        {
+                            type: 'bar',
+                            label: '销售量 (千)',
+                            data: [80, 95, 75, 110],
+                            backgroundColor: 'rgba(56, 189, 248, 0.4)', // Light Blue
+                            borderRadius: 4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false } // Legend is custom HTML above
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { borderDash: [4, 4], color: '#f3f4f6' },
+                            ticks: { display: false } // Hide numbers for clean look
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+            window.salesMixedChart = salesMixedChart;
+        }
+
+        // --- 3. 交互逻辑 ---
+        function toggleFilterModal() {
+            const modal = document.getElementById('filterModal');
+            const content = document.getElementById('filterContent');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('translate-y-full');
+                }, 10);
+            } else {
+                content.classList.add('translate-y-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // 修复的 toggleAgent 函数
+        function toggleAgent() {
+            const modal = document.getElementById('aiModal');
+            const content = document.getElementById('aiContent');
+            const backdrop = document.getElementById('aiBackdrop');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('translate-y-full');
+                    backdrop.classList.remove('opacity-0');
+                }, 10);
+            } else {
+                content.classList.add('translate-y-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function applyFilters() {
+            toggleFilterModal();
+            
+            // 模拟 Loading
+            document.body.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+                // Update chart data randomly to simulate filter effect
+                const newData1 = [1000 + Math.random()*500, 1200 + Math.random()*500, 900 + Math.random()*500, 1400 + Math.random()*500];
+                const newData2 = [70 + Math.random()*30, 80 + Math.random()*30, 60 + Math.random()*30, 100 + Math.random()*30];
+                
+                window.salesMixedChart.data.datasets[0].data = newData1;
+                window.salesMixedChart.data.datasets[1].data = newData2;
+                window.salesMixedChart.update();
+                
+                alert("筛选生效：\n区域：全球\n产业：全产业\n渠道：自营+Amazon\n时间：本月");
+            }, 600);
+        }
+
+        function verifyData() {
+            const bar = document.getElementById('status-bar');
+            if(confirm('确认数据无误并发布？')) {
+                bar.className = "bg-success/10 px-4 py-1.5 flex justify-between items-center text-xs text-success-700 border-b border-success/20";
+                bar.innerHTML = `<span class="flex items-center gap-1"><i class="ph-fill ph-check-circle"></i> 数据已发布</span><span>${new Date().toLocaleTimeString()}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
