@@ -105,7 +105,7 @@
         <div id="status-bar" class="bg-warning/10 px-4 py-1.5 flex justify-between items-center text-xs text-warning-700 border-b border-warning/20">
             <span class="flex items-center gap-1">
                 <i class="ph-fill ph-warning-circle"></i>
-                <span>草稿数据 (待运营确认)</span>
+                <span>预生产数据 (待运营确认)</span>
             </span>
             <button onclick="verifyData()" class="font-semibold underline">确认发布</button>
         </div>
@@ -336,7 +336,7 @@
             
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl">
-                <h3 class="text-lg font-bold text-gray-900">数据维度筛选</h3>
+                <h3 class="text-lg font-bold text-gray-900">数据筛选配置</h3>
                 <button onclick="toggleFilterModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                     <i class="ph-bold ph-x"></i>
                 </button>
@@ -345,7 +345,7 @@
             <!-- Modal Body (Scrollable) -->
             <div class="flex-1 overflow-y-auto px-6 py-4 space-y-8 bg-[#F9FAFB]">
                 
-                <!-- 1. 区域层级 (Region Cascade) -->
+                <!-- 2. 区域层级 (Region Cascade) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-globe-hemisphere-west text-primary"></i> 区域维度
@@ -358,8 +358,7 @@
                                 <option>全球 (Global)</option>
                                 <option>欧洲地区部</option>
                                 <option>亚太地区部</option>
-                                <option>拉美地区部</option>
-                                <option>中东非地区部</option>
+                                <option>美洲地区部</option>
                             </select>
                         </div>
                         <!-- L2 -->
@@ -385,7 +384,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 产业与产品 (Industry & SKU) -->
+                <!-- 3. 产业与产品 (Industry & SKU) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-device-mobile text-primary"></i> 产业维度
@@ -415,7 +414,7 @@
                     </div>
                 </div>
 
-                <!-- 3. 渠道 (Channel) -->
+                <!-- 4. 渠道 (Channel) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-shopping-cart text-primary"></i> 渠道维度
@@ -444,8 +443,10 @@
                                 <label for="ch_tik" class="text-sm text-gray-600">TikTok</label>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                <!-- 4. 时间筛选 (Timeline) -->
+                <!-- 1. 时间筛选 (Timeline) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-calendar-blank text-primary"></i> 时间维度
@@ -462,15 +463,13 @@
                         <i class="ph ph-calendar text-gray-400"></i>
                         <input type="text" id="dateRange" class="w-full text-sm outline-none bg-transparent" placeholder="自定义起止日期...">
                     </div>
-                    </div>
-                    </div>
                 </div>
             </div>
 
             <!-- Footer Action -->
             <div class="p-4 border-t border-gray-100 bg-white pb-8">
                 <button onclick="applyFilters()" class="w-full bg-primary text-white font-semibold text-lg py-3 rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-check"></i> 确认筛选条件
+                    <i class="ph-bold ph-check"></i> 应用筛选配置
                 </button>
             </div>
         </div>
@@ -497,7 +496,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-gray-800">电商AI助手</h4>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">AI Insight Engine Powered by Mcyo</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">AI Insight Engine</p>
                     </div>
                 </div>
                 <button onclick="clearChat()" class="text-gray-400 hover:text-danger p-2">
@@ -511,7 +510,7 @@
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-full bg-indigo-50 flex-shrink-0 flex items-center justify-center border border-indigo-100"><i class="ph-fill ph-robot text-indigo-500"></i></div>
                     <div class="bg-indigo-50/50 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700 max-w-[85%] border border-indigo-50">
-                        您好！我是您的首席电商数据专家。我已经接入了Gemini大模型和您的实时看板数据，可以为您分析：<br>
+                        您好！我是您的首席电商数据专家。我已经接入了实时看板数据，可以为您分析：<br>
                         <ul class="list-disc ml-4 mt-2 space-y-1">
                             <li>获取电商销售快报</li>
                             <li>获取大促复盘报告</li>
@@ -538,9 +537,9 @@
 
     <script>
         // --- API 配置 (由环境注入) ---
-        const apiKey = "";
-        const AI_MODEL = "gemini-2.5-flash-preview-09-2025";
-
+        // 注意：这里使用模拟API响应，因为无法直接调用DeepSeek等外部API
+        // 在实际应用中，您需要配置自己的后端API来处理AI请求
+        
         // --- 1. 初始化 DatePicker ---
         flatpickr("#dateRange", {
             mode: "range",
@@ -749,7 +748,8 @@
             `;
         }
 
-        async function fetchAIResponse(userPrompt) {
+        // 模拟AI响应函数
+        function simulateAIResponse(userPrompt) {
             // 获取当前页面数据状态作为上下文
             const dashboardContext = `
                 当前仪表盘数据状态：
@@ -760,38 +760,28 @@
                 - 用户资产: 注册用户 1.2M, DAU 320k, NSS 64
             `;
 
-            const systemPrompt = `你是一位顶尖的电商首席执行官（CEO）助理和资深数据分析专家。
-            你的任务是基于提供的“当前仪表盘数据状态”回答用户。
-            回答风格：专业、精简、洞察力强。
-            请使用中文回答，并适当使用数据佐证。不要提供虚假数据，如果数据中没有提到的内容请礼貌告知。`;
-
-            let retries = 0;
-            const maxRetries = 5;
-
-            while (retries < maxRetries) {
-                try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{ text: `上下文：${dashboardContext}\n\n问题：${userPrompt}` }]
-                            }],
-                            systemInstruction: {
-                                parts: [{ text: systemPrompt }]
-                            }
-                        })
-                    });
-
-                    if (!response.ok) throw new Error('API Request Failed');
-                    const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "抱歉，我暂时无法处理您的请求。";
-                } catch (error) {
-                    retries++;
-                    if (retries === maxRetries) throw error;
-                    await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 1000));
-                }
+            // 根据用户问题类型返回不同的模拟回答
+            if (userPrompt.includes('GMV') || userPrompt.includes('收入') || userPrompt.includes('gmv')) {
+                return `根据当前数据，本月GMV为42.8亿，已完成年度目标的92%。相比去年同期增长了约8.2%，但距离46亿的目标还有3.2亿的差距。建议重点关注自营APP渠道，目前贡献了45%的GMV，可考虑加大营销投入提升转化率。`;
+            } else if (userPrompt.includes('利润') || userPrompt.includes('净利润') || userPrompt.includes('profit')) {
+                return `本月净利润达到8.56亿，同比增长12.4%，表现优秀。利润率约为20%，说明成本控制和定价策略有效。建议继续保持现有策略，同时关注高毛利产品的推广。`;
+            } else if (userPrompt.includes('渠道') || userPrompt.includes('amazon') || userPrompt.includes('tiktok')) {
+                return `从渠道分析看，自营APP贡献了45%的GMV，Amazon占30%，TikTok占15%，其他渠道占10%。自营渠道表现强劲，但Amazon和TikTok仍有增长空间。建议针对不同渠道制定差异化营销策略。`;
+            } else if (userPrompt.includes('转化') || userPrompt.includes('漏斗')) {
+                return `当前整体转化率为2.8%，其中CTR为16.3%，订单转化率为20%。转化漏斗显示从曝光到成交的流失主要发生在加购环节（从点击到加购转化率仅14.1%）。建议优化商品详情页和购物车体验。`;
+            } else if (userPrompt.includes('用户') || userPrompt.includes('DAU')) {
+                return `用户资产方面，注册用户达120万，日活用户32万（12%增长率），订阅用户8.5万。DAU增长显著，说明用户粘性在提升。建议通过个性化推荐进一步提升用户价值。`;
+            } else {
+                return `基于当前数据，我为您提供以下分析：\n\n1. **业务概况**：GMV 42.8亿（目标完成率92%），净利润8.56亿（同比增长12.4%）。\n2. **渠道表现**：自营APP占比45%，Amazon 30%，TikTok 15%。\n3. **转化效率**：整体转化率2.8%，需重点关注加购到下单环节。\n4. **用户增长**：日活用户32万，同比增长12%，用户粘性良好。\n\n如需深入分析特定领域，请具体提问。`;
             }
+        }
+
+        async function fetchAIResponse(userPrompt) {
+            // 模拟延迟，让用户体验更真实
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // 返回模拟的AI响应
+            return simulateAIResponse(userPrompt);
         }
 
         async function sendMessage() {
@@ -813,7 +803,7 @@
             addLoadingIndicator();
 
             try {
-                // 3. 调用 API
+                // 3. 获取模拟API响应
                 const responseText = await fetchAIResponse(text);
                 removeLoadingIndicator();
 
@@ -838,8 +828,9 @@
                 type();
 
             } catch (error) {
+                console.error('Error in AI response:', error);
                 removeLoadingIndicator();
-                addMessage("发生网络错误，请稍后重试。", 'bot');
+                addMessage("发生错误，请稍后重试。", 'bot');
                 isGenerating = false;
                 input.disabled = false;
                 btn.disabled = false;
