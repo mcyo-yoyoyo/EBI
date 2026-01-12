@@ -105,7 +105,7 @@
         <div id="status-bar" class="bg-warning/10 px-4 py-1.5 flex justify-between items-center text-xs text-warning-700 border-b border-warning/20">
             <span class="flex items-center gap-1">
                 <i class="ph-fill ph-warning-circle"></i>
-                <span>预生产数据 (待运营确认)</span>
+                <span>草稿数据 (待运营确认)</span>
             </span>
             <button onclick="verifyData()" class="font-semibold underline">确认发布</button>
         </div>
@@ -336,7 +336,7 @@
             
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl">
-                <h3 class="text-lg font-bold text-gray-900">数据筛选配置</h3>
+                <h3 class="text-lg font-bold text-gray-900">数据维度筛选</h3>
                 <button onclick="toggleFilterModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
                     <i class="ph-bold ph-x"></i>
                 </button>
@@ -345,7 +345,7 @@
             <!-- Modal Body (Scrollable) -->
             <div class="flex-1 overflow-y-auto px-6 py-4 space-y-8 bg-[#F9FAFB]">
                 
-                <!-- 2. 区域层级 (Region Cascade) -->
+                <!-- 1. 区域层级 (Region Cascade) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-globe-hemisphere-west text-primary"></i> 区域维度
@@ -358,7 +358,8 @@
                                 <option>全球 (Global)</option>
                                 <option>欧洲地区部</option>
                                 <option>亚太地区部</option>
-                                <option>美洲地区部</option>
+                                <option>拉美地区部</option>
+                                <option>中东非地区部</option>
                             </select>
                         </div>
                         <!-- L2 -->
@@ -384,7 +385,7 @@
                     </div>
                 </div>
 
-                <!-- 3. 产业与产品 (Industry & SKU) -->
+                <!-- 2. 产业与产品 (Industry & SKU) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-device-mobile text-primary"></i> 产业维度
@@ -414,7 +415,7 @@
                     </div>
                 </div>
 
-                <!-- 4. 渠道 (Channel) -->
+                <!-- 3. 渠道 (Channel) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-shopping-cart text-primary"></i> 渠道维度
@@ -442,9 +443,9 @@
                                 <input type="checkbox" id="ch_tik" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary" checked>
                                 <label for="ch_tik" class="text-sm text-gray-600">TikTok</label>
                             </div>
-                            </div>
+                        </div>
 
-                <!-- 1. 时间筛选 (Timeline) -->
+                <!-- 4. 时间筛选 (Timeline) -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <i class="ph-fill ph-calendar-blank text-primary"></i> 时间维度
@@ -461,7 +462,7 @@
                         <i class="ph ph-calendar text-gray-400"></i>
                         <input type="text" id="dateRange" class="w-full text-sm outline-none bg-transparent" placeholder="自定义起止日期...">
                     </div>
-                </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -469,7 +470,7 @@
             <!-- Footer Action -->
             <div class="p-4 border-t border-gray-100 bg-white pb-8">
                 <button onclick="applyFilters()" class="w-full bg-primary text-white font-semibold text-lg py-3 rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-check"></i> 应用筛选配置
+                    <i class="ph-bold ph-check"></i> 确认筛选条件
                 </button>
             </div>
         </div>
@@ -496,7 +497,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-gray-800">电商AI助手</h4>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">AI Insight Engine Powered by Mcyo</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">AI Insight Engine</p>
                     </div>
                 </div>
                 <button onclick="clearChat()" class="text-gray-400 hover:text-danger p-2">
@@ -510,11 +511,13 @@
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-full bg-indigo-50 flex-shrink-0 flex items-center justify-center border border-indigo-100"><i class="ph-fill ph-robot text-indigo-500"></i></div>
                     <div class="bg-indigo-50/50 p-3 rounded-2xl rounded-tl-none text-sm text-gray-700 max-w-[85%] border border-indigo-50">
-                        您好！我是您的首席电商数据专家。我已经接入了Deepseek大模型和您的实时看板数据，可以为您分析：<br>
+                        您好！我是您的首席电商数据专家。我已经接入了Gemini大模型和您的实时看板数据，可以为您分析：<br>
                         <ul class="list-disc ml-4 mt-2 space-y-1">
-                            <li>分析本月 GMV 达成情况</li>
-                            <li>解读当前利润增长原因</li>
-                            <li>预测后续流量转化趋势</li>
+                            <li>获取电商销售快报</li>
+                            <li>获取大促复盘报告</li>
+                            <li>分析本月GMV达成</li>
+                            <li>解读利润增长原因</li>
+                            <li>预测流量转化趋势</li>
                         </ul>
                     </div>
                 </div>
@@ -535,7 +538,7 @@
 
     <script>
         // --- API 配置 (由环境注入) ---
-        const apiKey = "sk-7dcf5a8e51a34428b638b8319e91e21e";
+        const apiKey = "";
         const AI_MODEL = "gemini-2.5-flash-preview-09-2025";
 
         // --- 1. 初始化 DatePicker ---
